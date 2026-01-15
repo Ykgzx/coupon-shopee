@@ -1,65 +1,139 @@
-import Image from "next/image";
+'use client';
 
-export default function Home() {
+import { useEffect, useState } from 'react';
+import { Copy, Check } from 'lucide-react';
+import { Coupon } from './types/coupon';
+import Navbar from './components/Navbar';
+import Footer from './components/Footer';
+
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbxh6LBEsrINbn-VAeOVJcUMEpFvq9hKmmj0R8GoFxlVIK-eeBptAnYJX9MCuRDAyDw/exec';
+const API_KEY = 'SECRET123';
+
+// CouponCard แบบ UI ใกล้เคียงรูปที่ 2 (ปุ่มเดียว)
+function CouponCard({ coupon }: { coupon: Coupon }) {
+  const [copied, setCopied] = useState(false);
+
+  const handleAction = () => {
+    // เปิดลิงก์ก่อนเพื่อป้องกัน popup blocker
+    window.open("https://shopee.co.th/amsel.official", "_blank", "noopener,noreferrer");
+
+    // คัดลอกโค้ด
+    navigator.clipboard
+      .writeText(coupon.code)
+      .then(() => {
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      })
+      .catch((err) => {
+        console.error("คัดลอกไม่สำเร็จ:", err);
+      });
+  };
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+    <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-orange-200/50 hover:shadow-xl transition-all duration-300">
+      {/* ส่วนหัว - ไล่สีส้ม */}
+      <div className="bg-gradient-to-br from-orange-600 to-red-600 p-6 text-white">
+        <p className="text-sm font-medium opacity-90">
+          50% OFF ลด 50%
+        </p>
+        <h2 className="text-xl font-bold mt-1">
+          {coupon.title || "ส่วนลดพิเศษสำหรับสินค้าเลือก"}
+        </h2>
+        <p className="text-sm opacity-90 mt-1">
+          {coupon.description || "สำหรับสินค้าอิเล็กทรอนิกส์"}
+        </p>
+      </div>
+
+      {/* ส่วนโค้ด + ปุ่มหลัก */}
+      <div className="p-5 pt-6">
+        <div className="text-center mb-4">
+          <p className="text-sm text-gray-600 font-medium">
+            ใช้โค้ดนี้เพื่อรับส่วนลดทันที
           </p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        {/* กล่องโค้ดสไตล์รูปที่ 2 */}
+        <div className="border-2 border-dashed border-orange-400 rounded-xl bg-orange-50/60 p-4 mb-5 text-center">
+          <span className="font-mono text-3xl sm:text-4xl font-black tracking-wider text-orange-700">
+            {coupon.code}
+          </span>
+        </div>
+
+        {/* ปุ่มหลักเดียว - ใหญ่ เด่น */}
+        <button
+          onClick={handleAction}
+          className={`w-full py-4 px-6 rounded-xl font-bold text-lg transition-all duration-300 shadow-md
+            ${copied 
+              ? "bg-green-600 hover:bg-green-700 text-white" 
+              : "bg-orange-600 hover:bg-orange-700 active:bg-orange-800 text-white"
+            } flex items-center justify-center gap-3`}
+        >
+          {copied ? (
+            <>
+              <Check className="w-6 h-6" />
+              คัดลอกแล้ว ✓
+            </>
+          ) : (
+            <>
+              <span className="text-xl">📋</span>
+              {coupon.code} - ไปช้อปเลย!
+            </>
+          )}
+        </button>
+
+        {/* วันหมดอายุ */}
+        <p className="text-sm text-gray-600 text-center mt-4 font-medium">
+          หมดอายุ: {new Date(coupon.expire).toLocaleDateString('th-TH', {
+            day: 'numeric',
+            month: 'short',
+            year: 'numeric',
+          })}
+        </p>
+      </div>
+
+      {/* แถบสีล่างเหมือนรูป */}
+      <div className="h-3 bg-gradient-to-r from-orange-500 via-red-500 to-orange-600"></div>
+    </div>
+  );
+}
+
+export default function Home() {
+  const [coupons, setCoupons] = useState<Coupon[]>([]);
+
+  useEffect(() => {
+    fetch(`${GAS_URL}?key=${API_KEY}`)
+      .then(res => res.json())
+      .then(result => {
+        if (result.success) {
+          setCoupons(result.data);
+        }
+      })
+      .catch(console.error);
+  }, []);
+
+  return (
+    <>
+      <Navbar />
+      <main className="min-h-screen bg-gradient-to-b from-orange-50 via-orange-100 to-orange-50 py-10 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
+          <h1 className="text-4xl sm:text-5xl font-bold text-center mb-12 text-orange-800 drop-shadow-sm">
+            🎁 คูปองเดือนนี้
+          </h1>
+
+          {coupons.length === 0 ? (
+            <div className="text-center py-16 text-orange-700/80 text-lg">
+              กำลังโหลดคูปอง... หรือยังไม่มีคูปองในขณะนี้
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-8">
+              {coupons.map((c) => (
+                <CouponCard key={c.code} coupon={c} />
+              ))}
+            </div>
+          )}
         </div>
       </main>
-    </div>
+      <Footer />
+    </>
   );
 }
