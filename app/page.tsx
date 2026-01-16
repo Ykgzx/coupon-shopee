@@ -113,7 +113,8 @@ export default function Home() {
 
   return (
     <>
-      <Navbar />
+      
+      <img src="https://amselnutraceutical.com/wp-content/uploads/2025/12/edit5-Amsel-Banner-Website-jul-copy.webp" alt="" />
       <main className="min-h-screen bg-gradient-to-b from-orange-50 via-orange-100 to-orange-50 py-10 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <h1 className="text-4xl sm:text-5xl font-bold text-center mb-12 text-orange-800 drop-shadow-sm">
